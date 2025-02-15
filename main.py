@@ -78,13 +78,6 @@ def install_uv_and_run_datagen(user_email: str):
     return {"stdout": proc.stdout, "stderr": proc.stderr}
 
 def format_markdown():
-    """
-    Formats the file /data/format.md using prettier@3.4.2.
-    The file is updated in-place.
-    
-    This version mimics the evaluation script: it pipes the file content into Prettier
-    using the "--stdin-filepath /data/format.md" option.
-    """
     # Define the local data directory (project-root/data)
     local_data_dir = os.path.join(os.getcwd(), "data")
     
@@ -287,10 +280,6 @@ def localize_path(path: str) -> str:
     relative_part = os.path.relpath(path, "/data")  # e.g. "email.txt"
     return os.path.join(os.getcwd(), "data", relative_part)
 
-
-############################################################
-# HELPER TO CALL GPT-4o-Mini
-############################################################
 def call_openai(prompt: str) -> str:
     """
     Sends 'prompt' to GPT-4o-Mini (via AI Proxy) and returns the raw string response.
@@ -313,10 +302,6 @@ def call_openai(prompt: str) -> str:
     raw_message = response["choices"][0]["message"]["content"]
     return raw_message.strip()
 
-
-############################################################
-# A7 TASK: EXTRACT SENDER'S EMAIL USING TWO-STEP GPT APPROACH
-############################################################
 def handle_task_A7():
     """
     1. Reads the global 'last_user_instruction' for user’s instructions.
@@ -328,9 +313,6 @@ def handle_task_A7():
     """
     global last_user_instruction
 
-    # -----------------------------------------
-    # STEP 1: Ask GPT for input_file & output_file
-    # -----------------------------------------
     prompt_step1 = f"""
 You are a task automation assistant. Extract the following details from the task description:
 
@@ -371,9 +353,6 @@ No extra text.
     local_input_file = localize_path(input_file)
     local_output_file = localize_path(output_file)
 
-    # -----------------------------------------
-    # STEP 2: Read the email content from local_input_file
-    # -----------------------------------------
     if not os.path.exists(local_input_file):
         return {"error": f"Input file not found: {input_file}"}
 
@@ -383,9 +362,6 @@ No extra text.
     except Exception as e:
         return {"error": f"Could not read input file: {str(e)}"}
 
-    # -----------------------------------------
-    # STEP 3: Ask GPT to parse the email content for sender's email
-    # -----------------------------------------
     prompt_step2 = f"""
 You are a task automation assistant. Extract the following details from the email content:
 - "email": The extracted sender's email address.
@@ -422,9 +398,6 @@ Do not include any explanations, just return the JSON object.
             "raw_response": data_step2
         }
 
-    # -----------------------------------------
-    # STEP 4: Write the email to local_output_file
-    # -----------------------------------------
     try:
         with open(local_output_file, "w", encoding="utf-8") as f:
             f.write(sender_email)
