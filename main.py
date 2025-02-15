@@ -1,13 +1,11 @@
 from fastapi import FastAPI, HTTPException, Body, Request, Query
 from fastapi.responses import PlainTextResponse
 import os
-import uvicorn
 import json
 import sqlite3
 import subprocess
 from datetime import datetime
 from pathlib import Path
-from typing import List, Dict, Any
 import pandas as pd
 from dotenv import load_dotenv
 import numpy as np
@@ -16,7 +14,6 @@ import requests
 import openai
 import re
 import shutil
-import sys
 import pytesseract
 
 load_dotenv()
