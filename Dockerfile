@@ -1,36 +1,36 @@
-# Use Python 3.10 as base image
-FROM python:3.10-slim
+# Use an official Python runtime as a parent image
+FROM python:3.9-slim
+
+# Prevent Python from writing pyc files to disk and enable unbuffered logging
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+
+# Install system dependencies (including Tesseract OCR)
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    libjpeg-dev \
+    zlib1g-dev \
+    tesseract-ocr \
+    libtesseract-dev \
+ && rm -rf /var/lib/apt/lists/*
 
 # Set working directory
 WORKDIR /app
 
-# Install system dependencies
-RUN apt-get update && apt-get install -y \
-    curl \
-    nodejs \
-    npm \
-    && rm -rf /var/lib/apt/lists/*
+# Upgrade pip
+RUN pip install --upgrade pip
 
-# Install prettier globally
-RUN npm install -g prettier@3.4.2
-
-# Copy requirements first to leverage Docker cache
+# Copy only the requirements file first to leverage Docker cache
 COPY requirements.txt .
 
 # Install Python dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Install uv
-RUN pip install uv
-
-# Copy application code
+# Copy the rest of the application code
 COPY . .
 
-# Create directory for data
-RUN mkdir -p /app/data && chmod 777 /app/data
-
-# Expose port
+# Expose the port that uvicorn will run on
 EXPOSE 8000
 
-# Command to run the application
+# Command to run the application with uvicorn
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]

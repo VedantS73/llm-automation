@@ -1,8 +1,12 @@
 fastapi
 uvicorn
-python-dotenv
-openai
 pillow
-pandas
+faker
+openai==0.28.0
 requests
+httpx
+pandas
 numpy
+python-dateutil
+pytesseract
+python-dotenv
